@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404 
+from django.db import IntegrityError
+from django.contrib.auth.models import User
 # Create your views here.
 
 
@@ -31,7 +33,7 @@ def product_info(request, name):
 
 def cart_view(request):
     session_key = request.session.session_key
-    cart_items = CartItem.objects.filter(Q(user=request.user) )
+    cart_items = CartItem.objects.filter(session_key=session_key)
     total_price = sum(item.item.price * item.quantity for item in cart_items)
     context = {
         "cart_items": cart_items,
@@ -39,26 +41,44 @@ def cart_view(request):
     }
     return render(request, "main/cart.html", context)
 
-def add_to_cart(request, name, quantity=1,size=None):
+def add_to_cart(request, name, quantity=1, size=None):
     item = get_object_or_404(Item, name=name)
 
-    cart_item, created = CartItem.objects.get_or_create(user=request.user, item=item,size = size,defaults={'quantity': quantity})
+    # Ensure that the session has a session key
+    if not request.session.session_key:
+        request.session.save()
 
-    if not created:
-        cart_item.quantity += quantity
-        cart_item.save()
+    try:
+        # Retrieve the user-specific cart using the session key
+        session_key = request.session.session_key
 
-    print(f"Added {quantity} {item.name}(s) to the cart. New quantity: {cart_item.quantity}")
+        # Check if the item already exists in the cart
+        cart_item, created = CartItem.objects.get_or_create(session_key=session_key, item=item, size=size, defaults={'quantity': quantity})
 
-    response_data = {
-        'message': f"Added {quantity} {item.name}(s) of size {size} to the cart. New quantity: {cart_item.quantity}",
-        'item_name': item.name,
-        'quantity': cart_item.quantity,
-        'size': cart_item.size
-    }
+        if not created:
+            # If the CartItem already exists, update the quantity
+            cart_item.quantity += quantity
+            cart_item.save()
 
-    return JsonResponse(response_data)
+        print(f"Added {quantity} {item.name}(s) to the cart. New quantity: {cart_item.quantity}")
 
+        response_data = {
+            'message': f"Added {quantity} {item.name}(s) of size {size} to the cart. New quantity: {cart_item.quantity}",
+            'item_name': item.name,
+            'quantity': cart_item.quantity,
+            'size': cart_item.size
+        }
+
+        return JsonResponse(response_data)
+
+    except IntegrityError as e:
+        print(f"IntegrityError: {e}")
+        response_data = {'error': 'Failed to add item to cart.'}
+        return JsonResponse(response_data, status=500)
+    except IntegrityError as e:
+        print(f"IntegrityError: {e}")
+        response_data = {'error': 'Failed to add item to cart.'}
+        return JsonResponse(response_data, status=500)
 def remove_from_cart(request, name, size=None):
     item = get_object_or_404(Item, name=name)
 
@@ -79,7 +99,7 @@ def remove_from_cart(request, name, size=None):
 
 def checkout(request):
     session_key = request.session.session_key
-    cart_items = CartItem.objects.filter(user=request.user)
+    cart_items = CartItem.objects.filter(session_key=session_key)
     print(cart_items)
     order_summary = ', '.join([f"{item.quantity} {item.size} {item.item.name}" for item in cart_items])
     print(order_summary)

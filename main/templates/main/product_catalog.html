@@ -6,11 +6,18 @@
     <div class="row">
         <div class="col-md-12">
             <div class="jumbotron">
-                <h1 class="display-4">Welcome to Mend From Within</h1>
-                <p class="lead">Your Inner Journey Starts Here</p>
-                <hr class="my-4">
-                
+                {% if category == 'bundle' %}
+                    <p style="font-size: 18px; font-weight: bold;">Mend With Love Collection</p>
+                    <p>Celebrate love with us</p>
+                {% elif category == 'cosy' %}
+                    <p style="font-size: 18px; font-weight: bold;">Cosy Wear Collection</p>
+                    <p>Healing your mind, one cosy step at a time</p>
+                {% else %}
+                    <p style="font-size: 18px; font-weight: bold;">Mend With Love Collection</p>
+                    <p>Celebrate love with us</p>
+                {% endif %}
             </div>
+            
         </div>
     </div>
 </div>

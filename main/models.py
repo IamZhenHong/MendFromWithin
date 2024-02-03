@@ -22,6 +22,8 @@ class CartItem(models.Model):
     user = models.CharField(max_length=100, blank=True)
     size = models.CharField(max_length=100, blank=True)
     order = models.ForeignKey('Order', on_delete=models.CASCADE, blank=True, null=True)
+    session_key = models.CharField(max_length=100, blank=True)
+    
 
 
     def __str__(self):
