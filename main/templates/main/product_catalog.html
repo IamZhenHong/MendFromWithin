@@ -7,10 +7,9 @@
         <div class="col-md-12">
             <div class="jumbotron">
                 <h1 class="display-4">Welcome to MendfromWithin</h1>
-                <p class="lead">We sell the best quality of clothes.</p>
+                <p class="lead">Your inner journey starts here</p>
                 <hr class="my-4">
-                <p>Click the button below to start shopping.</p>
-                <a class="btn btn-primary btn-lg" href="{% url 'product_catalog' category='all' %}" role="button">Shop now</a>
+                
             </div>
         </div>
     </div>
@@ -20,13 +19,12 @@
         {% for item in items %}
         <div class="col-md-3">
             <div class="card mb-4">
-                
                 <div class="card-body">
-                    <div id="carousel{{ item.id }}" class="carousel slide" data-ride="carousel">
+                    <div id="carousel{{ item.id }}" class="carousel slide" data-ride="carousel" style="height: 280px; overflow: hidden;">
                         <div class="carousel-inner">
                             {% for image in item.itemimage_set.all %}
                                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                    <img src="{{ image.image.url }}" class="d-block w-100" alt="Item Image">
+                                    <img src="{{ image.image.url }}" class="d-block w-100" alt="Item Image" style="object-fit: cover; height: 100%;">
                                 </div>
                             {% endfor %}
                         </div>
@@ -42,16 +40,14 @@
                     <h5 class="card-title">{{ item.name }}</h5>
                     <p class="card-text">{{ item.description }}</p>
                     <p class="card-text"> RM{{ item.price }}</p>
-                    <a href="{% url 'product_info' item.name %}" class="btn btn-primary">View</a>
+                    <a href="{% url 'product_info' item.name %}" class="btn btn-dark">View</a>
                     <!-- Placeholder button -->
-                    <button class="btn btn-success" onclick="addToCart('{{ item.name }}', 1)">Add to Cart</button>
+                    <!-- <button class="btn btn-dark" onclick="addToCart('{{ item.name }}', 1)">Add to Cart</button> -->
                 </div>
-                
             </div>
         </div>
         {% endfor %}
     </div>
-    
 </div>
 
 <!-- JavaScript function to handle adding items to cart -->

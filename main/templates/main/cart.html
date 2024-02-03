@@ -9,6 +9,9 @@
             <!-- Left side: Cart Items -->
             <div class="col-md-8">
                 <h1>Shopping Cart</h1>
+                {% if not cart_items %}
+                    <p>Your cart is empty.</p>
+                {% endif %}
 
                 {% for cart_item in cart_items %}
                     <div class="row mb-4">
