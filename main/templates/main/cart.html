@@ -21,8 +21,9 @@
                                 <div class="card-body">
                                     <h2 class="card-title">{{ cart_item.item.name}}</h2>
                                     <p class="card-text"><strong>Description:</strong> {{ cart_item.item.description }}</p>
-                                    <p class="card-text"><strong>Price:</strong> {{ cart_item.item.price }}</p>
+                                    <p class="card-text"><strong>size:</strong> {{ cart_item.size }}</p>
                                     <p class="card-text"><strong>Quantity:</strong> {{ cart_item.quantity }}</p>
+                                    <p class="card-text"><strong>Price:</strong> {{ cart_item.item.price }}</p>
                                     <button class="btn btn-danger" onclick="removeFromCart('{{ cart_item.item.name }}', '{{ cart_item.item.size }}')">Remove from Cart</button>
 
                             </div>

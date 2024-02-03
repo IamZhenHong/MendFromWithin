@@ -21,17 +21,19 @@ class CartItem(models.Model):
     quantity = models.IntegerField()
     user = models.CharField(max_length=100, blank=True)
     size = models.CharField(max_length=100, blank=True)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, blank=True, null=True)
 
 
     def __str__(self):
-        return f"{self.quantity} of {self.item.name}"
+        return f"{self.quantity} of {self.size} {self.item.name}"
 class Order(models.Model):
-    items = models.ManyToManyField(CartItem)
+    
     total = models.IntegerField()
     date = models.DateTimeField(auto_now_add=True)
     user = models.CharField(max_length=100)
     session_key = models.CharField(max_length=100, blank=True)
     receipt = models.FileField(upload_to='receipts/', blank=True, null=True)
+    order_summary = models.TextField(blank=True) 
 
 
     def __str__(self):

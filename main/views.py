@@ -76,9 +76,13 @@ def remove_from_cart(request, name, size=None):
 
     return JsonResponse(response_data)
 
+
 def checkout(request):
     session_key = request.session.session_key
     cart_items = CartItem.objects.filter(user=request.user)
+    print(cart_items)
+    order_summary = ', '.join([f"{item.quantity} {item.size} {item.item.name}" for item in cart_items])
+    print(order_summary)
     total_amount = sum(item.item.price * item.quantity for item in cart_items)
 
     if request.method == 'POST':
@@ -93,10 +97,16 @@ def checkout(request):
             name = checkout_form.cleaned_data['name']
 
             order = Order.objects.create(user=name, session_key=session_key, total=total_amount)
-            order.items.set(cart_items)
+
+            # Add CartItem instances to the order
+            for cart_item in cart_items:
+                cart_item.order = order
+                cart_item.save()
+            
+            order.order_summary = order_summary
             order.receipt = payment_form.cleaned_data['receipt']
             order.save()
-            print(cart_items) 
+            print(cart_items)
 
             # Process the payment, generate QR code, etc.
 
@@ -107,8 +117,5 @@ def checkout(request):
         payment_form = PaymentForm()
 
     return render(request, 'main/checkout.html', {'checkout_form': checkout_form, 'payment_form': payment_form, 'total_amount': total_amount, 'cart_items': cart_items})
-
-
-
 def order_success(request):
     return render(request, 'main/order_success.html')

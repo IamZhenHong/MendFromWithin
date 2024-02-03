@@ -9,7 +9,15 @@ class ItemImageInline(admin.TabularInline):  # or admin.StackedInline for a diff
 class ItemAdmin(admin.ModelAdmin):
     inlines = [ItemImageInline]
 
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 1
+
+class OrderAdmin(admin.ModelAdmin):
+    model = Order
+    inlines = [CartItemInline]
+
 admin.site.register(Item, ItemAdmin)
 admin.site.register(CartItem)
-admin.site.register(Order)
+admin.site.register(Order, OrderAdmin)
 admin.site.register(ItemImage)

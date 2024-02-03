@@ -9,7 +9,7 @@
     <h3>Cart Summary</h3>
     <ul>
       {% for cart_item in cart_items %}
-        <li>{{ cart_item.item.name }} - Quantity: {{ cart_item.quantity }} - Price: ${{ cart_item.item.price }}</li>
+        <li>{{ cart_item.item.name }} - Quantity: {{ cart_item.quantity }} - Size: {{cart_item.size}} - Price: ${{ cart_item.item.price }} each</li>
       {% endfor %}
     </ul>
 
