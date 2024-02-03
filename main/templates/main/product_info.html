@@ -1,0 +1,138 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="{{ item.image.url }}" alt="{{ item.title }}" class="img-fluid">
+            </div>
+            <div class="col-md-6">
+                <h2>{{ item.name }}</h2>
+
+                <p>{{ item.description }}</p>
+                <p>{{ item.price }}</p>
+                
+                <!-- Quantity input with plus and minus buttons -->
+                <div>
+                    <button id="decrement">-</button>
+                    <input type="number" id="quantity" value="1" min="1">
+                    <button id="increment">+</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="size">Select Size:</label>
+                    <select class="form-control" id="size">
+                        <option value="small">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="large">Large</option>
+                        <!-- Add more size options as needed -->
+                    </select>
+                </div>
+                
+                <!-- Add to Cart button -->
+                <button id="addToCart">Add to Cart</button>
+
+                <!-- Container for showing response messages -->
+                <div id="responseContainer"></div>
+
+                <!-- Modal to display response message -->
+                <div class="modal" tabindex="-1" role="dialog" id="responseModal">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Response Message</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" id="responseModalBody">
+                                <!-- Response message will be displayed here -->
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+        function getCookie(name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+            
+            if (parts.length === 2) {
+                return parts.pop().split(";").shift();
+            }
+        }
+        var jq = jQuery.noConflict();
+
+        jq(document).ready(function() {
+            if (typeof jQuery == 'undefined') {
+                console.error('jQuery is not loaded.');
+            } else {
+                console.log('jQuery is loaded.');
+            }
+            var quantityInput = jq('#quantity');
+            var itemName = "{{ item.name }}";
+
+            // Decrement button
+            jq('#decrement').click(function() {
+                var currentValue = parseInt(quantityInput.val(), 10);
+                if (currentValue > 1) {
+                    quantityInput.val(currentValue - 1);
+                }
+            });
+
+            // Increment button
+            jq('#increment').click(function() {
+                var currentValue = parseInt(quantityInput.val(), 10);
+                quantityInput.val(currentValue + 1);
+            });
+
+            // Add to Cart button
+            jq('#addToCart').click(function() {
+                var quantity = parseInt(quantityInput.val(), 10);
+                var size = jq('#size').val();
+                console.log("Quantity:", quantity);
+                var csrftoken = getCookie('csrftoken');
+                var itemName = "{{ item.name }}";
+                
+
+                // Make an AJAX request to the server
+                jq.ajax({
+                    type: 'POST',
+                    url: "{% url 'add_to_cart' 0 0 0 %}".replace('0', itemName).replace('0', quantity).replace('0', size),  
+                    beforeSend: function(xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    success: function (response) {
+                        // Handle the response from the server
+                        // jq('#responseContainer').html('<p>' + response.message + '</p>');
+
+                        // Open the modal and display the response message
+                        jq('#responseModalBody').html(response.message);
+                        jq('#responseModal').modal('show');
+
+                        // You can add additional logic based on the server response
+                        if (response.success) {
+                            // Handle success, show a tab, etc.
+                        }
+                    },
+                    error: function () {
+                        jq('#responseContainer').html('<p>Error occurred while adding to cart.</p>');
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,54 @@
+<!-- main/checkout.html -->
+
+{% extends 'main/base.html' %}
+
+{% block body %}
+  <h2>Checkout</h2>
+
+  <div>
+    <h3>Cart Summary</h3>
+    <ul>
+      {% for cart_item in cart_items %}
+        <li>{{ cart_item.item.name }} - Quantity: {{ cart_item.quantity }} - Price: ${{ cart_item.item.price }}</li>
+      {% endfor %}
+    </ul>
+
+    <p id="total-amount">Total Amount: ${{ total_amount }}</p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    {{ checkout_form.as_p }}
+    
+    <label for="id_receipt">Transaction Receipt:</label>
+    {{ payment_form.receipt }}
+    
+    <button type="submit">Place Order</button>
+  </form>
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Function to update total amount based on delivery option
+      function updateTotalAmount() {
+        var totalAmount = parseFloat({{ total_amount }});  // Ensure the total_amount is treated as a number
+        var deliveryOption = $('select[name="delivery_option"]').val();
+
+        if (deliveryOption === 'delivery') {
+          totalAmount += 10;
+        }
+
+        $('#total-amount').text('Total Amount: $' + totalAmount.toFixed(2));  // Ensure two decimal places
+      }
+
+      // Update total amount on page load
+      updateTotalAmount();
+
+      // Listen for changes in the delivery option and update total amount
+      $('select[name="delivery_option"]').change(function () {
+        updateTotalAmount();
+      });
+    });
+  </script>
+{% endblock %}

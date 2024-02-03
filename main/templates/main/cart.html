@@ -1,0 +1,142 @@
+<!-- FILEPATH: /Users/zhenhongseng/Python/mfw1/main/templates/main/cart.html -->
+
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Left side: Cart Items -->
+            <div class="col-md-8">
+                <h1>Shopping Cart</h1>
+
+                {% for cart_item in cart_items %}
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <!-- Apply styling to scale down cart item images -->
+                            <img src="{{ cart_item.item.image.url }}" alt="{{ cart_item.item.title }}" class="img-fluid cart-item-image">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card cart-item-details">
+                                <div class="card-body">
+                                    <h2 class="card-title">{{ cart_item.item.name}}</h2>
+                                    <p class="card-text"><strong>Description:</strong> {{ cart_item.item.description }}</p>
+                                    <p class="card-text"><strong>Price:</strong> {{ cart_item.item.price }}</p>
+                                    <p class="card-text"><strong>Quantity:</strong> {{ cart_item.quantity }}</p>
+                                    <button class="btn btn-danger" onclick="removeFromCart('{{ cart_item.item.name }}', '{{ cart_item.item.size }}')">Remove from Cart</button>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Right side: Order Summary with Checkout button -->
+            <div class="col-md-4">
+                <h2>Order Summary</h2>
+                <div class="order-summary">
+                    <!-- Display total price -->
+                    <p>Total Price: RM <span id="total-price">{{ total_price }}</span></p>
+                    <!-- Method of Delivery selection -->
+                    <p>Method of Delivery:
+                        <select id="delivery-method" onchange="updateTotalPrice()">
+                            <option value="pickup">Pickup</option>
+                            <option value="delivery">Delivery (+RM 10)</option>
+                        </select>
+                    </p>
+                    <!-- Display payment method -->
+                    <p>Payment Method: <!-- Display payment method --></p>
+                    <!-- "Proceed to Checkout" button moved to the Order Summary section -->
+                    <a href="{% url 'checkout' %}" class="btn btn-primary mt-4">Proceed to Checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'script.js' %}"></script>
+
+    <script>
+        function updateTotalPrice() {
+            // Get the selected delivery method
+            var deliveryMethod = document.getElementById('delivery-method').value;
+            
+            // Get the current total price
+            var totalPrice = parseFloat(document.getElementById('total-price').innerText);
+
+            // Update the total price based on the delivery method
+            if (deliveryMethod === 'delivery') {
+                totalPrice += 10;
+            }
+
+            // Display the updated total price
+            document.getElementById('total-price').innerText = totalPrice.toFixed(2);
+        }
+
+        function removeFromCart(itemName, itemSize) {
+            var csrftoken = getCookie('csrftoken');
+
+            // Make an AJAX request to the remove from cart view
+            $.ajax({
+                type: 'POST',
+                url: `/remove_from_cart/${itemName}/${itemSize}/`,
+                beforeSend: function(xhr, settings) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                },
+                success: function (response) {
+                    console.log('AJAX Success:', response);
+
+                    // Handle success, you can update the UI or show a message to the user
+                    alert(response.message);
+
+                    // Optionally, you can reload the page to reflect the updated cart
+                    location.reload();
+                },
+                error: function (error) {
+                    console.log('AJAX Error:', error);
+
+                    // Handle error, show an alert or update the UI accordingly
+                    alert('Error occurred while removing item from cart.');
+                }
+            });
+        }
+
+
+        // Function to get the CSRF token from cookies
+        function getCookie(name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+
+            if (parts.length === 2) {
+                return parts.pop().split(";").shift();
+            }
+        }
+    </script>
+
+    <style>
+        /* Add styling to scale down cart item images */
+        .cart-item-image {
+            max-width: 100%; /* Set the maximum width as a percentage for responsiveness */
+            height: auto; /* Maintain the aspect ratio */
+        }
+
+        /* Additional styling for the cart layout */
+        .cart-item-details {
+            padding: 1rem;
+            /* Remove border to achieve a cleaner look */
+            /* border: 1px solid #ddd; */
+            border-radius: 8px; /* Add some border-radius for a rounded appearance */
+        }
+
+        .order-summary {
+            /* Remove border to achieve a cleaner look */
+            /* border: 1px solid #ddd; */
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        /* Adjust styling for the "Proceed to Checkout" button */
+        #checkout-btn {
+            display: block;
+        }
+    </style>
+{% endblock %}
