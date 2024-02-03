@@ -6,8 +6,8 @@
     <div class="row">
         <div class="col-md-12">
             <div class="jumbotron">
-                <h1 class="display-4">Welcome to MendfromWithin</h1>
-                <p class="lead">Your inner journey starts here</p>
+                <h1 class="display-4">Welcome to Mend From Within</h1>
+                <p class="lead">Your Inner Journey Starts Here</p>
                 <hr class="my-4">
                 
             </div>
@@ -37,7 +37,22 @@
                             <span class="sr-only">Next</span>
                         </a>
                     </div>
-                    <h5 class="card-title">{{ item.name }}</h5>
+                    <h5 class="card-title">
+                        {% if item.category == 'bundle' %}
+                            {% if item.name == 'The_Perfect_Date_Bundle' %}
+                                The Perfect Date Bundle
+                            {% elif item.name == 'For You and I"Bundle' %}
+                                For You and I Bundle
+                            {% elif item.name == 'All_about_love_Bundle' %}
+                                All about love Bundle
+                            {% else %}
+                                {{ item.name }}
+                            {% endif %}
+                        {% else %}
+                            {{ item.name }}
+                        {% endif %}
+                    </h5>
+                    
                     <p class="card-text">{{ item.description }}</p>
                     <p class="card-text"> RM{{ item.price }}</p>
                     <a href="{% url 'product_info' item.name %}" class="btn btn-dark">View</a>

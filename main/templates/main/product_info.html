@@ -28,7 +28,21 @@
             </div>
             
             <div class="col-md-6">
-                <h2>{{ item.name }}</h2>
+                <h5 class="card-title">
+                    {% if item.category == 'bundle' %}
+                        {% if item.name == 'The_Perfect_Date_Bundle' %}
+                            The Perfect Date Bundle
+                        {% elif item.name == 'For You and I"Bundle' %}
+                            For You and I Bundle
+                        {% elif item.name == 'All_about_love_Bundle' %}
+                            All about love Bundle
+                        {% else %}
+                            {{ item.name }}
+                        {% endif %}
+                    {% else %}
+                        {{ item.name }}
+                    {% endif %}
+                </h5>
 
                 <p>Description: {{ item.description }}</p>
                 <p>Price: RM {{ item.price }}</p>

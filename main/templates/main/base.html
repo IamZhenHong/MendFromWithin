@@ -64,24 +64,23 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark custom-navbar">
-        <div class="container">
-            <div class="dropdown">
-                <a class="navbar-brand dropdown-toggle" href="#" role="button" id="shopDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Shop
-                </a>
-                <div class="dropdown-menu" aria-labelledby="shopDropdown">
-                    <a class="dropdown-item" href="{% url 'product_catalog' category='cosy' %}">Cosy wear</a>
-                    <a class="dropdown-item" href="{% url 'product_catalog' category='valentine' %}">Valentine</a>
-                    <a class="dropdown-item" href="{% url 'product_catalog' category='bundle'%}">Bundle set</a>
-                </div>
-            </div>
-            <a class="navbar-brand mx-auto" style="position: absolute; left: 50%; transform: translateX(-50%);" href="{% url 'landing' %}">
-                <img src="{% static 'main/images/logo.png' %}" alt="MendfromWithin Logo" style="height: 40px; width: auto;">
+    <!-- ... (previous code) ... -->
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark custom-navbar">
+    <div class="container">
+        <div class="dropdown">
+            <a class="navbar-brand dropdown-toggle" href="#" role="button" id="shopDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Shop
             </a>
-            
+            <div class="dropdown-menu" aria-labelledby="shopDropdown">
+                <a class="dropdown-item" href="{% url 'product_catalog' category='cosy' %}">Cosy wear</a>
+                <a class="dropdown-item" href="{% url 'product_catalog' category='valentine' %}">Valentine</a>
+                <a class="dropdown-item" href="{% url 'product_catalog' category='bundle'%}">Bundle set</a>
+            </div>
         </div>
-        
+        <a class="navbar-brand mx-auto" style="position: absolute; left: 50%; transform: translateX(-50%);" href="{% url 'landing' %}">
+            <img src="{% static 'main/images/logo.png' %}" alt="MendfromWithin Logo" style="height: 40px; width: auto;">
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -90,18 +89,16 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="{% url 'cart' %}">Cart</a>
                 </li>
-                <!-- <li class="nav-item active">
-                    <a class="nav-link" href="#">Home</a>
-                </li> -->
                 <li class="nav-item active">
                     <a class="nav-link" href="#">About</a>
                 </li>
-                <!-- <li class="nav-item active">
-                    <a class="nav-link" href="#">Contact</a>
-                </li> -->
             </ul>
         </div>
-    </nav>
+    </div>
+</nav>
+
+<!-- ... (remaining code) ... -->
+
 
     <div class="container">
         {% block body %}
