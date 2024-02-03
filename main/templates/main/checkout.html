@@ -3,6 +3,7 @@
 {% extends 'main/base.html' %}
 
 {% block body %}
+  {% load static %}
   <h2>Checkout</h2>
 
   <div>
@@ -21,9 +22,11 @@
     
     {{ checkout_form.as_p }}
     
+    <img src="{% static 'main/images/qr.jpg' %}" alt="QR Code Image" class="scaled-qr">
+    
     <label for="id_receipt">Transaction Receipt:</label>
     {{ payment_form.receipt }}
-    
+
     <button type="submit">Place Order</button>
   </form>
 
@@ -51,4 +54,12 @@
       });
     });
   </script>
+
+  <style>
+    /* Add styling for the scaled QR code */
+    .scaled-qr {
+      max-width: 100%; /* Set the maximum width as a percentage for responsiveness */
+      height: 30%; /* Maintain the aspect ratio */
+    }
+  </style>
 {% endblock %}
