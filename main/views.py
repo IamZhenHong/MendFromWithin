@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Item, CartItem, Order
+from .models import Item, CartItem, Order, User
 from .forms import CheckoutForm, PaymentForm
 from django.shortcuts import redirect
 from django.contrib.sessions.models import Session
@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404 
 from django.db import IntegrityError
-from django.contrib.auth.models import User
+
 # Create your views here.
 
 
@@ -51,6 +51,11 @@ def add_to_cart(request, name, quantity=1, size=None):
     try:
         # Retrieve the user-specific cart using the session key
         session_key = request.session.session_key
+        if item.category == 'bundle':
+            input_value = request.POST.get('custom_input', '')
+        else:
+            input_value = size
+        print(input_value)
 
         # Check if the item already exists in the cart
         cart_item, created = CartItem.objects.get_or_create(session_key=session_key, item=item, size=size, defaults={'quantity': quantity})
@@ -75,15 +80,13 @@ def add_to_cart(request, name, quantity=1, size=None):
         print(f"IntegrityError: {e}")
         response_data = {'error': 'Failed to add item to cart.'}
         return JsonResponse(response_data, status=500)
-    except IntegrityError as e:
-        print(f"IntegrityError: {e}")
-        response_data = {'error': 'Failed to add item to cart.'}
-        return JsonResponse(response_data, status=500)
-def remove_from_cart(request, name, size=None):
+
+
+def remove_from_cart(request, name,quantity, size=None):
     item = get_object_or_404(Item, name=name)
 
     # Get the cart item based on the user, item, and optional size
-    cart_item = get_object_or_404(CartItem, user=request.user, item=item, size=size)
+    cart_item = get_object_or_404(CartItem, item=item, quantity=quantity, size=size) 
 
     # Delete the cart item
     cart_item.delete()
@@ -100,9 +103,7 @@ def remove_from_cart(request, name, size=None):
 def checkout(request):
     session_key = request.session.session_key
     cart_items = CartItem.objects.filter(session_key=session_key)
-    print(cart_items)
     order_summary = ', '.join([f"{item.quantity} {item.size} {item.item.name}" for item in cart_items])
-    print(order_summary)
     total_amount = sum(item.item.price * item.quantity for item in cart_items)
 
     if request.method == 'POST':
@@ -110,15 +111,23 @@ def checkout(request):
         payment_form = PaymentForm(request.POST, request.FILES)
 
         if checkout_form.is_valid() and payment_form.is_valid():
-            # Check the selected delivery option and adjust the total amount
             delivery_option = checkout_form.cleaned_data.get('delivery_option')
             if delivery_option == 'delivery':
                 total_amount += 10
+
+            # Create or get the CustomUser based on the provided information
             name = checkout_form.cleaned_data['name']
+            email = checkout_form.cleaned_data['email']
+            phone_number = checkout_form.cleaned_data['phone_number']
 
-            order = Order.objects.create(user=name, session_key=session_key, total=total_amount)
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={ 'name': name, 'phone_number': phone_number}
+            )
 
-            # Add CartItem instances to the order
+            # Create the Order and link it to the CustomUser
+            order = Order.objects.create(user=user, session_key=session_key, total=total_amount)
+            
             for cart_item in cart_items:
                 cart_item.order = order
                 cart_item.save()
@@ -126,7 +135,6 @@ def checkout(request):
             order.order_summary = order_summary
             order.receipt = payment_form.cleaned_data['receipt']
             order.save()
-            print(cart_items)
 
             # Process the payment, generate QR code, etc.
 
@@ -137,5 +145,5 @@ def checkout(request):
         payment_form = PaymentForm()
 
     return render(request, 'main/checkout.html', {'checkout_form': checkout_form, 'payment_form': payment_form, 'total_amount': total_amount, 'cart_items': cart_items})
-def order_success(request):
+def order_success(request): 
     return render(request, 'main/order_success.html')

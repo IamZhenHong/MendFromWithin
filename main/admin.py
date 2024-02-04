@@ -1,10 +1,10 @@
 from django.contrib import admin
-from .models import Item, CartItem, Order, ItemImage
+from .models import Item, CartItem, Order, ItemImage, User
 
 # Register your models here.
-class ItemImageInline(admin.TabularInline):  # or admin.StackedInline for a different layout
+class ItemImageInline(admin.TabularInline):
     model = ItemImage
-    extra = 1  # Number of empty forms to display for adding new images
+    extra = 1
 
 class ItemAdmin(admin.ModelAdmin):
     inlines = [ItemImageInline]
@@ -14,10 +14,22 @@ class CartItemInline(admin.TabularInline):
     extra = 1
 
 class OrderAdmin(admin.ModelAdmin):
-    model = Order
     inlines = [CartItemInline]
+    list_display = ['id', 'user_info', 'get_phone_number', 'total', 'date']
+    list_display_links = ['id', 'user_info']
+
+    def user_info(self, obj):
+        return f"{obj.user.username} "
+
+    user_info.short_description = 'User Information'
+
+    def get_phone_number(self, obj):
+        return obj.user.phone_number
+
+    get_phone_number.short_description = 'Phone Number'
 
 admin.site.register(Item, ItemAdmin)
 admin.site.register(CartItem)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(ItemImage)
+admin.site.register(User)

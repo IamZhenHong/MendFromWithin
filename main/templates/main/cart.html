@@ -23,12 +23,28 @@
                         <div class="col-md-8">
                             <div class="card cart-item-details">
                                 <div class="card-body">
-                                    <h2 class="card-title">{{ cart_item.item.name}}</h2>
+                                    <h5 class="card-title" style="margin-top: 40px;">
+                                 
+                                        {% if cart_item.0.category == 'bundle' %}
+                                            print("bundle")
+                                            {% if cart_item.item.name == 'The_Perfect_Date_Bundle' %}
+                                                The Perfect Date Bundle
+                                            {% elif cart_item.item.name == 'For You and I"Bundle' %}
+                                                For You and I Bundle
+                                            {% elif cart_item.item.name == 'All_about_love_Bundle' %}
+                                                All about love Bundle
+                                            {% else %}
+                                                {{ cart_item.item.name }}
+                                            {% endif %}
+                                        {% else %}
+                                            {{ cart_item.item.name }}
+                                        {% endif %}
+                                    </h5>
                                     <p class="card-text"><strong>Description:</strong> {{ cart_item.item.description }}</p>
                                     <p class="card-text"><strong>size:</strong> {{ cart_item.size }}</p>
                                     <p class="card-text"><strong>Quantity:</strong> {{ cart_item.quantity }}</p>
                                     <p class="card-text"><strong>Price:</strong> {{ cart_item.item.price }}</p>
-                                    <button class="btn btn-danger" onclick="removeFromCart('{{ cart_item.item.name }}', '{{ cart_item.item.size }}')">Remove from Cart</button>
+                                    <button class="btn btn-danger" onclick="removeFromCart('{{ cart_item.item.name }}','{{ cart_item.quantity}}','{{ cart_item.size }}')">Remove from Cart</button>
 
                             </div>
                         </div>
@@ -57,10 +73,12 @@
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <script src="{% static 'script.js' %}"></script>
 
     <script>
+        var jq = jQuery.noConflict();
         function updateTotalPrice() {
             // Get the selected delivery method
             var deliveryMethod = document.getElementById('delivery-method').value;
@@ -77,13 +95,13 @@
             document.getElementById('total-price').innerText = totalPrice.toFixed(2);
         }
 
-        function removeFromCart(itemName, itemSize) {
+        function removeFromCart(itemName, quantity,size) {
             var csrftoken = getCookie('csrftoken');
 
             // Make an AJAX request to the remove from cart view
-            $.ajax({
+            jq.ajax({
                 type: 'POST',
-                url: `/remove_from_cart/${itemName}/${itemSize}/`,
+                url: "{% url 'remove_from_cart' 0 0 0 %}".replace('0', itemName).replace('0', quantity).replace('0', size),  
                 beforeSend: function(xhr, settings) {
                     xhr.setRequestHeader("X-CSRFToken", csrftoken);
                 },
