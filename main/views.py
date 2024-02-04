@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404 
 from django.db import IntegrityError
-
+from django.utils import timezone
 # Create your views here.
 
 
@@ -124,9 +124,10 @@ def checkout(request):
                 email=email,
                 defaults={ 'name': name, 'phone_number': phone_number}
             )
+            date=timezone.now()  
 
             # Create the Order and link it to the CustomUser
-            order = Order.objects.create(user=user, session_key=session_key, total=total_amount)
+            order = Order.objects.create(user=user, session_key=session_key, total=total_amount, date=date)
             
             for cart_item in cart_items:
                 cart_item.order = order
