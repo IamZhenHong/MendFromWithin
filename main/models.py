@@ -58,6 +58,8 @@ class Order(models.Model):
     session_key = models.CharField(max_length=100, blank=True)
     receipt = models.FileField(upload_to='receipts/', blank=True, null=True)
     order_summary = models.TextField(blank=True) 
+    delivery_option = models.CharField(max_length=10, blank=True, choices=[('delivery', 'Delivery +$10'), ('pickup', 'Pickup')])
+    shipping_address = models.CharField(max_length=255, blank=True)
 
 
     def __str__(self):

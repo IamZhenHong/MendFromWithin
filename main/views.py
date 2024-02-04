@@ -122,12 +122,12 @@ def checkout(request):
 
             user, created = User.objects.get_or_create(
                 email=email,
-                defaults={ 'name': name, 'phone_number': phone_number}
+                defaults={ 'name': name, 'phone_number': phone_number, 'delivery_option': delivery_option , 'shipping_address': checkout_form.cleaned_data['shipping_address']}
             )
             date=timezone.now()  
 
             # Create the Order and link it to the CustomUser
-            order = Order.objects.create(user=user, session_key=session_key, total=total_amount, date=date)
+            order = Order.objects.create(user=user, session_key=session_key, total=total_amount, date=date,delivery_option=delivery_option,shipping_address=checkout_form.cleaned_data['shipping_address'])
             
             for cart_item in cart_items:
                 cart_item.order = order
