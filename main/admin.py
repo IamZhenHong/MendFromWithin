@@ -15,9 +15,8 @@ class CartItemInline(admin.TabularInline):
 
 class OrderAdmin(admin.ModelAdmin):
     inlines = [CartItemInline]
-    list_display = ['id', 'user_info', 'get_phone_number', 'total', 'date']
-    list_display_links = ['id', 'user_info']
-
+    list_display = [ 'get_phone_number']
+    list_display_links = ['user']
 
     def get_phone_number(self, obj):
         return obj.user.phone_number
@@ -29,4 +28,3 @@ admin.site.register(CartItem)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(ItemImage)
 admin.site.register(User)
- 
